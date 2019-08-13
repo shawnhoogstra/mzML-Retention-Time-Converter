@@ -11,3 +11,8 @@ A reference file in 'csv' format is required in order to convert retention times
 The standard format of these files is three columns with the first column containing the retention time or retention index of the standards in the type of run you would like to convert your file to. The second column includes the m/z of the the standard compound. The final column includes the retention times of the standard compounds run at the same conditions of your unconverted file.
 
 Simply run the script at the command line or use the included .exe file to load up the tool. Keep in mind running the .exe file may take some time to load as it has to compile the code. It is included for those who wish to not use the command line. Simple browse to the locations of your reference file, your mzML, and the location/name of where you want to save your converted file. Click convert and wait until confirmation of conversion.
+
+## How it works
+RTC generates a cubic spline function using the Akima1DInterpolator from the scipy package. See https://docs.scipy.org/doc/scipy-0.18.1/reference/generated/scipy.interpolate.Akima1DInterpolator.html for more details. Simply put a curve is drawn through the points in the reference file using the retention times for the given standard compounds as the x and y coordinates. This curve can then be used to convert retention times from one run to another run under differing conditions. 
+
+Note that this interpolator is only used for precise data and the curve will only pass through the specified points exactly. As such, interpolating past the given standards will given inaccurate results. Therefore, files will only be converted within the given retention times of the standard compounds.
