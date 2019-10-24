@@ -6,8 +6,9 @@ import PySimpleGUI as sg
 def main():
     layout = [[sg.Text('Convert Retention Times')],
               [sg.Text('Reference File', size=(15, 1)), sg.InputText(), sg.FileBrowse()],
-              [sg.Text('MzML Data File', size=(15, 1)), sg.InputText(), sg.FileBrowse()],
-              [sg.Text('Output Data File', size=(15, 1)), sg.Input(), sg.FileSaveAs()],
+              [sg.Text('MzML Data File', size=(15, 1)), sg.InputText(), sg.FilesBrowse()],
+              [sg.Text('Output Folder', size=(15,1)), sg.InputText(), sg.FolderBrowse()],
+              [sg.Text('Output Data File Tag', size=(15, 1)), sg.InputText()],
               [sg.Button('Convert'), sg.Exit()]]
 
     window = sg.Window('Retention Time Converter', layout)
@@ -17,9 +18,11 @@ def main():
         if event is None or event == 'Exit':
             break
         if event == 'Convert':
-            reference_path, raw_files_path, save_file_path = values[0], values[1], values[2]
-            convertFile(reference_path, raw_files_path, save_file_path)
-
+            reference_path, raw_files_path, save_folder, save_file_tag = values[0], values[1], values[2], values[3]
+            for file in raw_files_path.split(";"):
+                save_file_path = (save_folder + "/" + save_file_tag + file.split("/")[-1])
+                convertFile(reference_path, file, save_file_path)
+            sg.Popup('Conversion Complete')
     window.Close()
 
 
@@ -45,7 +48,7 @@ def convertFile(referenceFile, mzmlFile, save_file_path):
         #Set up output file
         outFile = open(save_file_path, "w")
 
-
+        i = 0
         #loop through mzML file
         while i < readFile.__len__():
             if "spectrum index=" in readFile[i]: #check if we are at the next spectrum
@@ -104,7 +107,6 @@ def convertFile(referenceFile, mzmlFile, save_file_path):
 
 
         outFile.close()
-        sg.Popup('Conversion Complete')
     else:
         sg.PopupError(
             'Wrong data format. Please select a .csv file for the reference file and a .mzML file for the data file.')
